@@ -16,7 +16,7 @@ A 3D flocking simulation built with Go and [raylib-go](https://github.com/gen2br
 ## Running
 
 ```sh
-go run ./cmd/
+make run
 ```
 
 ## License
