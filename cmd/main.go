@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	defCount = 500
+	defCount = 2000
 )
 
 func main() {
-	w, h := int32(2200), int32(1200)
+	w, h := int32(2400), int32(1300)
 	bound := rl.NewRectangle(0, 0, float32(w), float32(h))
 	s := sim.NewSim(w, h, defCount, &bound)
 	s.Run()

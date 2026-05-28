@@ -25,9 +25,9 @@ func SpawnBoids(count int, bound *rl.Rectangle) []*Boid {
 
 func densityColor(d uint8) rl.Color {
 	t := float32(d) / 255.0
-	r := uint8(210 + t*45)
-	g := uint8(70 + t*155)
-	b := uint8(90 - t*40)
+	r := uint8(80 + t*80)
+	g := uint8(200 - t*160)
+	b := uint8(255 - t*35)
 	return rl.NewColor(r, g, b, 255)
 }
 

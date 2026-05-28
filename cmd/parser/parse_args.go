@@ -20,6 +20,5 @@ func NewParser(args []Arg) *Parser {
 }
 
 func (p *Parser) Parse() *ParsedArgs {
-
 	return &ParsedArgs{}
 }

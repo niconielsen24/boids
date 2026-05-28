@@ -1,6 +1,10 @@
 package sim
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"math"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 const (
 	defVel = 120.0
@@ -89,6 +93,7 @@ func (b *Boid) UpdateDir(others []*Boid, df float32) {
 	lerpedNewDir := rl.Vector2Lerp(b.Direction, newDir, turnSpeed*df)
 	b.Direction = rl.Vector2Normalize(lerpedNewDir)
 	b.mapNeighborsToDensity(neighborCount)
+	//b.mapNeighborsToDensityBitwise(neighborCount)
 }
 
 func (b *Boid) wrapAround(bounds *rl.Rectangle) {
@@ -109,5 +114,13 @@ func (b *Boid) mapNeighborsToDensity(neighborsCount int) {
 	if neighborsCount > maxNeighbors {
 		neighborsCount = maxNeighbors
 	}
-	b.Density = uint8(50 + float32(neighborsCount)/maxNeighbors*205)
+	t := math.Sqrt(float64(neighborsCount) / maxNeighbors)
+	b.Density = uint8(50 + t*205)
+}
+
+func (b *Boid) mapNeighborsToDensityBitwise(neighborsCount int) {
+	if neighborsCount > 8 {
+		neighborsCount = 8
+	}
+	b.Density = ^(uint8(0xFF) >> uint(neighborsCount))
 }
