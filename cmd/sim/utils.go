@@ -6,7 +6,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func SpawnBoids(count int, bound *rl.Rectangle) []*Boid {
+func spawnBoids(count int, bound *rl.Rectangle) []*Boid {
 	boids := make([]*Boid, count)
 	for i := range count {
 		boids[i] = NewBoid(
@@ -36,9 +36,9 @@ func renderBoid(b *Boid) {
 	perp := rl.NewVector2(-dir.Y, dir.X)
 	color := densityColor(b.Density)
 
-	tip   := rl.Vector2Add(b.Position, rl.Vector2Scale(dir, Radius*1.5))
-	baseL := rl.Vector2Add(rl.Vector2Subtract(b.Position, rl.Vector2Scale(dir, Radius*0.5)), rl.Vector2Scale(perp, Radius))
-	baseR := rl.Vector2Subtract(rl.Vector2Subtract(b.Position, rl.Vector2Scale(dir, Radius*0.5)), rl.Vector2Scale(perp, Radius))
+	tip := rl.Vector2Add(b.Position, rl.Vector2Scale(dir, drawRadius*1.5))
+	baseL := rl.Vector2Add(rl.Vector2Subtract(b.Position, rl.Vector2Scale(dir, drawRadius*0.5)), rl.Vector2Scale(perp, drawRadius))
+	baseR := rl.Vector2Subtract(rl.Vector2Subtract(b.Position, rl.Vector2Scale(dir, drawRadius*0.5)), rl.Vector2Scale(perp, drawRadius))
 
 	rl.DrawTriangle(tip, baseR, baseL, color)
 }

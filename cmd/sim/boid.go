@@ -9,13 +9,19 @@ import (
 const (
 	defVel = 120.0
 
-	Radius           = 8.0
-	PerceptionRadius = 80.0
+	drawRadius = 8.0
+	// Perception radii for the three main behaviors
+	// Tweak to change how far boids can see for each behavior
+	separationRadius = drawRadius * 4
+	alignmentRadius  = drawRadius * 6
+	cohesionRadius   = drawRadius * 8
 	fovThreshold     = 0.0
 
-	separationWeight = 3.0
-	cohesionWeight   = 1.1
-	alignmentWeight  = 0.8
+	// Weights for the three main behaviors
+	// Reynolds' original values were around 1.5 for separation, 1.0 for cohesion, and 1.0 for alignment
+	separationWeight = 1.5
+	cohesionWeight   = 1.0
+	alignmentWeight  = 1.0
 
 	turnSpeed = 5.0
 )
@@ -47,7 +53,7 @@ func (b *Boid) UpdateDir(others []*Boid, df float32) {
 		return
 	}
 
-	neighborCount := 0
+	alignCount, cohesionCount := 0, 0
 	separation := rl.NewVector2(0, 0)
 	alignment := rl.NewVector2(0, 0)
 	cohesion := rl.NewVector2(0, 0)
@@ -57,42 +63,42 @@ func (b *Boid) UpdateDir(others []*Boid, df float32) {
 			continue
 		}
 		dist := rl.Vector2Distance(b.Position, o.Position)
-		if dist <= 0 {
-			continue
-		}
-		if dist > PerceptionRadius {
+		if dist <= 0 || dist > cohesionRadius {
 			continue
 		}
 
 		toOther := rl.Vector2Normalize(rl.Vector2Subtract(o.Position, b.Position))
-		dot := rl.Vector2DotProduct(b.Direction, toOther)
-
-		if dot < fovThreshold {
+		if rl.Vector2DotProduct(b.Direction, toOther) < fovThreshold {
 			continue
 		}
 
-		diff := rl.Vector2Subtract(b.Position, o.Position)
-		diff = rl.Vector2Normalize(diff)
-		scale := separationWeight * (1.0 - dist/PerceptionRadius)
-		separation = rl.Vector2Add(separation, rl.Vector2Scale(diff, scale))
-
-		neighborCount++
-		alignment = rl.Vector2Add(alignment, o.Direction)
+		if dist < separationRadius {
+			diff := rl.Vector2Normalize(rl.Vector2Subtract(b.Position, o.Position))
+			scale := separationWeight * (1.0 - dist/separationRadius)
+			separation = rl.Vector2Add(separation, rl.Vector2Scale(diff, scale))
+		}
+		if dist < alignmentRadius {
+			alignCount++
+			alignment = rl.Vector2Add(alignment, o.Direction)
+		}
+		cohesionCount++
 		cohesion = rl.Vector2Add(cohesion, o.Position)
 	}
 
 	newDir := rl.Vector2Add(b.Direction, separation)
-	if neighborCount > 0 {
-		alignment = rl.Vector2Scale(alignment, 1.0/float32(neighborCount))
-		cohesion = rl.Vector2Scale(cohesion, 1.0/float32(neighborCount))
-		cohesionDir := rl.Vector2Normalize(rl.Vector2Subtract(cohesion, b.Position))
+	if alignCount > 0 {
+		alignment = rl.Vector2Scale(alignment, 1.0/float32(alignCount))
 		newDir = rl.Vector2Add(newDir, rl.Vector2Scale(alignment, alignmentWeight))
+	}
+	if cohesionCount > 0 {
+		cohesion = rl.Vector2Scale(cohesion, 1.0/float32(cohesionCount))
+		cohesionDir := rl.Vector2Normalize(rl.Vector2Subtract(cohesion, b.Position))
 		newDir = rl.Vector2Add(newDir, rl.Vector2Scale(cohesionDir, cohesionWeight))
 	}
 
 	lerpedNewDir := rl.Vector2Lerp(b.Direction, newDir, turnSpeed*df)
 	b.Direction = rl.Vector2Normalize(lerpedNewDir)
-	b.mapNeighborsToDensity(neighborCount)
+	b.mapNeighborsToDensity(cohesionCount)
 	//b.mapNeighborsToDensityBitwise(neighborCount)
 }
 
