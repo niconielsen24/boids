@@ -37,7 +37,7 @@ func (s *Sim) Run() {
 	var df float32 = 0.0
 	var accDf float32 = 0.0
 	var frames int = 0
-	var frameThreshold int = 3
+	var frameThreshold int = 100
 	var maxRad float32 = max(separationRadius, max(alignmentRadius, cohesionRadius))
 	var tree *Tree = NewTree(*s.bound)
 	var wg sync.WaitGroup

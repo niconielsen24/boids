@@ -18,7 +18,7 @@ var (
 )
 
 const (
-	defCount  = 2000
+	defCount  = 1000
 	defWidth  = 1920
 	defHeight = 1080
 )

@@ -9,21 +9,22 @@ import (
 const (
 	defVel = 120.0
 
-	drawRadius = 8.0
+	drawRadius = 2.0
 	// Perception radii for the three main behaviors
 	// Tweak to change how far boids can see for each behavior
-	separationRadius = drawRadius * 4
-	alignmentRadius  = drawRadius * 6
-	cohesionRadius   = drawRadius * 8
+	separationRadius = drawRadius * 10
+	alignmentRadius  = drawRadius * 10
+	cohesionRadius   = drawRadius * 10
 	fovThreshold     = 0.0
 
 	// Weights for the three main behaviors
 	// Reynolds' original values were around 1.5 for separation, 1.0 for cohesion, and 1.0 for alignment
-	separationWeight = 1.5
+	separationWeight = 1.2
 	cohesionWeight   = 1.0
 	alignmentWeight  = 1.0
 
-	turnSpeed = 5.0
+	turnSpeed    = 5.0
+	maxNeighbors = 30
 )
 
 type Boid struct {
@@ -58,7 +59,11 @@ func (b *Boid) UpdateDir(others []*Boid, df float32) {
 	alignment := rl.NewVector2(0, 0)
 	cohesion := rl.NewVector2(0, 0)
 
-	for _, o := range others {
+	for i, o := range others {
+		if i >= maxNeighbors-1 {
+			break
+		}
+
 		if o == b {
 			continue
 		}
